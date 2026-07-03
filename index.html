@@ -73,7 +73,7 @@
     <button class="swtab active" data-v="b">🏆 K.o.-Runde</button>
     <button class="swtab" data-v="s">🎲 Simulation</button>
     <button class="bell" id="bellBtn" title="Tor-Benachrichtigungen">🔔</button>
-    <span id="vstamp">v4.25</span>
+    <span id="vstamp">v4.26</span>
   </div>
   <div class="frames">
     <iframe id="fb" class="frame" title="K.o.-Runde"></iframe>
@@ -2386,7 +2386,25 @@
       Promise.resolve(run).catch(function(){}).then(function(){ pushBusy=false; bell.disabled=false; });
     }
     bell.addEventListener("click",togglePush);
-    if("serviceWorker" in navigator){navigator.serviceWorker.getRegistration().then(function(reg){if(reg&&reg.pushManager)reg.pushManager.getSubscription().then(function(s){if(s)bell.classList.add("on");});}).catch(function(){});}
+    // Beim App-Start: vorhandenes Abo STILL beim Worker re-registrieren.
+    // Hintergrund: iOS/APNs verwirft Web-Push-Abos ueber Nacht gelegentlich (Status 410),
+    // woraufhin der Worker sie aus seiner Liste loescht. Die Glocke bliebe faelschlich "an",
+    // ohne dass der Worker uns noch kennt -> keine Tor-Pushes. Das erneute /subscribe traegt
+    // uns beim ersten Oeffnen wieder ein (idempotent: gleicher subId-Key, kein Doppel-Abo).
+    if("serviceWorker" in navigator){
+      navigator.serviceWorker.getRegistration().then(function(reg){
+        if(!(reg&&reg.pushManager)) return;
+        reg.pushManager.getSubscription().then(function(s){
+          if(!s) return;
+          bell.classList.add("on");
+          if(WORKER_URL){
+            fetch(WORKER_URL.replace(/\/$/,"")+"/subscribe",
+              {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)}
+            ).catch(function(){});   // still, ohne Rueckmeldung an den Nutzer
+          }
+        });
+      }).catch(function(){});
+    }
   })();
   </script>
 </body>
