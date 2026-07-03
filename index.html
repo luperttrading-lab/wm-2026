@@ -73,7 +73,7 @@
     <button class="swtab active" data-v="b">🏆 K.o.-Runde</button>
     <button class="swtab" data-v="s">🎲 Simulation</button>
     <button class="bell" id="bellBtn" title="Tor-Benachrichtigungen">🔔</button>
-    <span id="vstamp">v4.29</span>
+    <span id="vstamp">v4.31</span>
   </div>
   <div class="frames">
     <iframe id="fb" class="frame" title="K.o.-Runde"></iframe>
@@ -1378,8 +1378,15 @@
   .yearsbtn{display:block; width:100%; margin:14px 0 6px; padding:12px 10px; border-radius:12px;
     border:1px solid rgba(244,198,74,.5); background:rgba(244,198,74,.12); color:var(--gold);
     font-size:13px; font-weight:800; cursor:pointer; line-height:1.3;}
-  .yintro{font-size:11.5px; color:var(--muted); margin-bottom:12px; line-height:1.55;}
+  .yintro{font-size:11.5px; color:var(--muted); margin-bottom:8px; line-height:1.55;}
   .yintro b{color:var(--txt);}
+  .ydet{margin:0 0 12px;}
+  .ydet summary{cursor:pointer; color:var(--gold); font-weight:700; font-size:11.5px; padding:2px 0; list-style:none; outline:none;}
+  .ydet summary::-webkit-details-marker{display:none;}
+  .ydet summary::before{content:"\25B8\00A0";}
+  .ydet[open] summary::before{content:"\25BE\00A0";}
+  .ydet p{margin:6px 0 0; font-size:11.5px; color:var(--muted); line-height:1.55;}
+  .ydet p b{color:var(--txt);}
   .yhead{display:flex; align-items:center; gap:8px; padding:0 2px 6px; font-size:10px;
     text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:800;
     border-bottom:1px solid var(--line);}
@@ -1773,7 +1780,8 @@
     }).join("");
     imodalTitle.textContent="Wie lange bis zum WM-Titel?";
     imodalBody.innerHTML =
-      `<p class="yintro">So lange dauert es im Schnitt, bis eine Mannschaft einmal Weltmeister wird – wenn sie dauerhaft so stark bliebe wie heute. Weil eine WM nur alle 4&nbsp;Jahre stattfindet, steht hinten beides: die <b>Jahre</b> und die Zahl der <b>Turniere</b>.</p>`
+      `<p class="yintro">So lange dauert es im Schnitt, bis eine Mannschaft einmal Weltmeister wird – wenn sie dauerhaft so stark bliebe wie heute und jedes Mal die K.-o.-Runde erreicht. Weil eine WM nur alle 4&nbsp;Jahre stattfindet, steht hinten beides: die <b>Jahre</b> und die Zahl der <b>Turniere</b>.</p>`
+      + `<details class="ydet"><summary>Genauer erklärt</summary><p>Grundlage ist der Stand zum Start der K.-o.-Runde: Die ganze Rechnung wird <b>nur einmal</b> zu diesem Zeitpunkt gemacht, mit den Spielstärken, die dann gelten. Es ist eine reine Was-wäre-wenn-Rechnung: Dass eine Mannschaft sich überhaupt für die WM qualifiziert und die Gruppenphase übersteht, ist <b>nicht</b> eingerechnet – die echten Wartezeiten wären also länger.</p></details>`
       + `<div class="yhead"><span class="yf"></span><span class="ynm">Mannschaft</span><span class="yy">Jahre</span><span class="yw">Turniere</span></div>`
       + rows;
     imodal.classList.add("on");
