@@ -73,7 +73,7 @@
     <button class="swtab active" data-v="b">🏆 K.o.-Runde</button>
     <button class="swtab" data-v="s">🎲 Simulation</button>
     <button class="bell" id="bellBtn" title="Tor-Benachrichtigungen">🔔</button>
-    <span id="vstamp">v4.26</span>
+    <span id="vstamp">v4.29</span>
   </div>
   <div class="frames">
     <iframe id="fb" class="frame" title="K.o.-Runde"></iframe>
@@ -1178,7 +1178,8 @@
     cursor:pointer; transition:.12s;}
   .seg button.on{background:var(--blue); color:#0b1226; border-color:var(--blue);}
 
-  .tabs{display:flex; gap:8px; margin-bottom:10px;}
+  .tabs{display:flex; gap:8px; margin-bottom:10px; position:sticky; top:0; z-index:20;
+    background:var(--bg); padding:6px 0 8px;}
   .tabs button{flex:1; padding:11px 5px; border:1px solid var(--line); background:var(--card);
     color:var(--muted); border-radius:11px; font-family:inherit; font-size:12.5px; font-weight:700;
     cursor:pointer; transition:.12s;}
@@ -1373,6 +1374,25 @@
   .imodal-body .iwarn{background:rgba(244,198,74,.08); border:1px solid rgba(244,198,74,.25);
     border-radius:9px; padding:9px 11px; margin-bottom:12px; font-size:11.5px;}
   .imodal-body .iwarn b{color:#ffd96b;}
+  /* "Jahre bis zum Titel" – Button + Liste im Modal */
+  .yearsbtn{display:block; width:100%; margin:14px 0 6px; padding:12px 10px; border-radius:12px;
+    border:1px solid rgba(244,198,74,.5); background:rgba(244,198,74,.12); color:var(--gold);
+    font-size:13px; font-weight:800; cursor:pointer; line-height:1.3;}
+  .yintro{font-size:11.5px; color:var(--muted); margin-bottom:12px; line-height:1.55;}
+  .yintro b{color:var(--txt);}
+  .yhead{display:flex; align-items:center; gap:8px; padding:0 2px 6px; font-size:10px;
+    text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:800;
+    border-bottom:1px solid var(--line);}
+  .yrow{display:flex; align-items:center; gap:8px; padding:2.5px 2px; font-size:13px;
+    border-bottom:1px solid rgba(255,255,255,.05);}
+  .yrow .yf{flex:0 0 20px; font-size:13.5px;}
+  .yrow .ynm{flex:1 1 auto; color:var(--txt); font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .yhead .yy,.yrow .yy{flex:0 0 76px; text-align:right; font-variant-numeric:tabular-nums;}
+  .yhead .yw,.yrow .yw{flex:0 0 66px; text-align:right; font-variant-numeric:tabular-nums;}
+  .yrow .yy{color:var(--gold); font-weight:800;}
+  .yrow .yw{color:var(--muted); font-weight:700;}
+  .yhead .yf,.yhead .ynm{flex-basis:auto;}
+  .yhead .yf{flex:0 0 22px;} .yhead .ynm{flex:1 1 auto;}
 </style>
 </head>
 <body>
@@ -1433,6 +1453,7 @@
     </div>
     <div class="status" id="probStatus"></div>
     <div class="rowlist" id="probList"></div>
+    <button class="yearsbtn" id="yearsBtn">⏳ Wie lange bis zum WM-Titel?</button>
   </div>
 
   <div class="view" id="viewSingle">
@@ -1733,6 +1754,31 @@
     if(key==="tf"){ const fh=$("fpHost"); if(fh) fh.innerHTML=buildForestSVG(); }
   }
   function closeInfo(){ imodal.classList.remove("on"); }
+  // ---- "Im Schnitt bis zum Titel": erwartete Jahre/Turniere = 1/p (geometrisch), p = Titelchance ----
+  function fmtYears(y){ return Math.round(y).toLocaleString("de-DE"); }
+  function fmtTurniere(w){ return w<10 ? w.toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1}) : Math.round(w).toLocaleString("de-DE"); }
+  function openYears(){
+    if(!startData || !startData.length){
+      imodalTitle.textContent="Noch keine Simulation";
+      imodalBody.innerHTML="<p>Bitte zuerst oben ein Turnier simulieren, dann stehen die Werte bereit.</p>";
+      imodal.classList.add("on"); return;
+    }
+    const data = startData.slice().sort((a,b)=>b.tit-a.tit);   // stärkste zuerst (kürzeste Wartezeit)
+    const rows = data.map(function(d){
+      const t=TEAMS[d.i], p=d.tit;                 // p = Titelchance in Prozent
+      let yy, ww;
+      if(p<=0){ yy="&gt;\u00A0400.000"; ww="&gt;\u00A0100.000"; }   // kein Titel in 100.000 Sims
+      else { yy=fmtYears(400/p); ww=fmtTurniere(100/p); }          // 4/p Jahre, 1/p Turniere
+      return `<div class="yrow"><span class="yf">${t.f}</span><span class="ynm">${t.n}</span><span class="yy">${yy}</span><span class="yw">${ww}</span></div>`;
+    }).join("");
+    imodalTitle.textContent="Wie lange bis zum WM-Titel?";
+    imodalBody.innerHTML =
+      `<p class="yintro">So lange dauert es im Schnitt, bis eine Mannschaft einmal Weltmeister wird – wenn sie dauerhaft so stark bliebe wie heute. Weil eine WM nur alle 4&nbsp;Jahre stattfindet, steht hinten beides: die <b>Jahre</b> und die Zahl der <b>Turniere</b>.</p>`
+      + `<div class="yhead"><span class="yf"></span><span class="ynm">Mannschaft</span><span class="yy">Jahre</span><span class="yw">Turniere</span></div>`
+      + rows;
+    imodal.classList.add("on");
+  }
+  $("yearsBtn").addEventListener("click", openYears);
   document.querySelectorAll(".ibtn").forEach(btn=>btn.addEventListener("click",()=>openInfo(btn.dataset.info)));
   const probList=$("probList"), probStatus=$("probStatus");
   let probView='now';                              // 'now' = bedingt auf Ergebnisse | 'start' = eingefroren
