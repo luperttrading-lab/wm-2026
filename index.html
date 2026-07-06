@@ -73,7 +73,7 @@
     <button class="swtab active" data-v="b">🏆 K.o.-Runde</button>
     <button class="swtab" data-v="s">🎲 Simulation</button>
     <button class="bell" id="bellBtn" title="Tor-Benachrichtigungen">🔔</button>
-    <span id="vstamp">v4.31</span>
+    <span id="vstamp">v4.32</span>
   </div>
   <div class="frames">
     <iframe id="fb" class="frame" title="K.o.-Runde"></iframe>
@@ -378,7 +378,7 @@
     {n:"Frankreich",    f:"🇫🇷", id:33}, {n:"Schweden",      f:"🇸🇪", id:23},
     {n:"Südafrika",     f:"🇿🇦", id:2},  {n:"Kanada",        f:"🇨🇦", id:5},
     {n:"Niederlande",   f:"🇳🇱", id:21}, {n:"Marokko",       f:"🇲🇦", id:10},
-    {n:"Kolumbien",     f:"🇨🇴", id:44}, {n:"Ghana",         f:"🇬🇭", id:47},
+    {n:"Portugal",      f:"🇵🇹", id:41}, {n:"Kroatien",      f:"🇭🇷", id:46},
     {n:"Spanien",       f:"🇪🇸", id:29}, {n:"Österreich",    f:"🇦🇹", id:39},
     {n:"USA",           f:"🇺🇸", id:13}, {n:"Bosnien-Herz.", f:"🇧🇦", id:6},
     {n:"Belgien",       f:"🇧🇪", id:25}, {n:"Senegal",       f:"🇸🇳", id:34},
@@ -389,7 +389,7 @@
     {n:"Argentinien",   f:"🇦🇷", id:37}, {n:"Kap Verde",     f:"🇨🇻", id:30},
     {n:"Australien",    f:"🇦🇺", id:15}, {n:"Ägypten",       f:"🇪🇬", id:26},
     {n:"Schweiz",       f:"🇨🇭", id:8},  {n:"Algerien",      f:"🇩🇿", id:38},
-    {n:"Portugal",      f:"🇵🇹", id:41}, {n:"Kroatien",      f:"🇭🇷", id:46}
+    {n:"Kolumbien",     f:"🇨🇴", id:44}, {n:"Ghana",         f:"🇬🇭", id:47}
   ];
 
   // ID -> englischer Name der Vergleichsquelle (openfootball) für Elfmeter-/Verlängerungs-Ausgang
@@ -418,9 +418,9 @@
   const DTS = [
     // Letzte 32 (Paarungen 0..15)
     [["29.06.","22:30"],["30.06.","23:00"],["28.06.","21:00"],["30.06.","03:00"],
-     ["04.07.","03:30"],["02.07.","21:00"],["02.07.","02:00"],["01.07.","22:00"],
+     ["03.07.","01:00"],["02.07.","21:00"],["02.07.","02:00"],["01.07.","22:00"],
      ["29.06.","19:00"],["30.06.","19:00"],["01.07.","03:00"],["01.07.","18:00"],
-     ["04.07.","00:00"],["03.07.","20:00"],["03.07.","05:00"],["03.07.","01:00"]],
+     ["04.07.","00:00"],["03.07.","20:00"],["03.07.","05:00"],["04.07.","03:30"]],
     // Achtelfinale (0..7)
     [["04.07.","23:00"],["04.07.","19:00"],["06.07.","21:00"],["07.07.","02:00"],
      ["05.07.","22:00"],["06.07.","02:00"],["07.07.","18:00"],["07.07.","22:00"]],
@@ -442,7 +442,7 @@
   let zoom = 0.7;          // Zoomfaktor (+/- Tasten) – Start etwas kleiner, beide Spalten sichtbar
 
   // ---- Speichern / Laden (eigene Eingaben bleiben beim nächsten Aufruf erhalten) ----
-  const STORE_KEY = "wm2026-bracket-2";
+  const STORE_KEY = "wm2026-bracket-3";
   function saveState(){
     try{
       localStorage.setItem(STORE_KEY, JSON.stringify({v:1, winner, scores, dts, third, score3, dt3, official, official3, telapsed, telapsed3}));
@@ -1525,7 +1525,7 @@
     {n:"Frankreich",c:"FRA",f:"🇫🇷",tf:0.0818}, {n:"Schweden",c:"SWE",f:"🇸🇪",tf:-0.0133},
     {n:"Südafrika",c:"RSA",f:"🇿🇦",tf:null},  {n:"Kanada",c:"CAN",f:"🇨🇦",host:1,tf:null},
     {n:"Niederlande",c:"NED",f:"🇳🇱",tf:0.0622},{n:"Marokko",c:"MAR",f:"🇲🇦",tf:0.0748},
-    {n:"Kolumbien",c:"COL",f:"🇨🇴",tf:-0.0142},  {n:"Ghana",c:"GHA",f:"🇬🇭",tf:null},
+    {n:"Portugal",c:"POR",f:"🇵🇹",tf:-0.0467},   {n:"Kroatien",c:"CRO",f:"🇭🇷",tf:0.1124},
     {n:"Spanien",c:"ESP",f:"🇪🇸",tf:-0.0284},    {n:"Österreich",c:"AUT",f:"🇦🇹",tf:null},
     {n:"USA",c:"USA",f:"🇺🇸",host:1,tf:-0.0957}, {n:"Bosnien-Herz.",c:"BIH",f:"🇧🇦",tf:null},
     {n:"Belgien",c:"BEL",f:"🇧🇪",tf:0.1094},    {n:"Senegal",c:"SEN",f:"🇸🇳",tf:null},
@@ -1536,7 +1536,7 @@
     {n:"Argentinien",c:"ARG",f:"🇦🇷",tf:0.0892},{n:"Kap Verde",c:"CPV",f:"🇨🇻",tf:null},
     {n:"Australien",c:"AUS",f:"🇦🇺",tf:-0.0277}, {n:"Ägypten",c:"EGY",f:"🇪🇬",tf:null},
     {n:"Schweiz",c:"SUI",f:"🇨🇭",tf:0.0478},    {n:"Algerien",c:"ALG",f:"🇩🇿",tf:null},
-    {n:"Portugal",c:"POR",f:"🇵🇹",tf:-0.0467},   {n:"Kroatien",c:"CRO",f:"🇭🇷",tf:0.1124},
+    {n:"Kolumbien",c:"COL",f:"🇨🇴",tf:-0.0142},  {n:"Ghana",c:"GHA",f:"🇬🇭",tf:null},
   ];
   const NT = TEAMS.length; // 32
   // Elo zentral aus dem Wrapper (Bracket-Slot-Reihenfolge) -> keine Doppelpflege mehr.
@@ -1544,7 +1544,7 @@
   for(let i=0;i<NT;i++) TEAMS[i].p = _WM_ELO[i];
 
   // ===== Bedingte Prognose: K.o.-Stand aus dem Bracket (gleicher Origin, geteilter localStorage) =====
-  const KO_STORE_KEY = "wm2026-bracket-2";
+  const KO_STORE_KEY = "wm2026-bracket-3";
   const KO_COUNTS = [16,8,4,2,1];
   const RABBR = ["SF","AF","VF","HF","F"];   // Sechzehntel-/Achtel-/Viertel-/Halbfinale, Finale
 
@@ -2329,12 +2329,12 @@
     var loaded={b:false,s:false};
 
     // ====== ZENTRALE ELO-QUELLE (single source of truth) ======
-    // Bracket-Slot-Reihenfolge (Slot 0 = Deutschland ... Slot 31 = Kroatien).
+    // Bracket-Slot-Reihenfolge (Slot 0 = Deutschland ... Slot 31 = Ghana; 8/9=Portugal/Kroatien, 30/31=Kolumbien/Ghana).
     // Wird beim Laden per Platzhalter (siehe unesc) in BEIDE iframes injiziert
     // (K.o.-Runde: PRED_ELO, Simulator: TEAMS[i].p) -> nur noch hier pflegen.
-    var WM_ELO=[1735.77,1505.35,1870.70,1509.79,1428.38,1559.48,1753.57,1755.10,1698.35,1380.00,
+    var WM_ELO=[1735.77,1505.35,1870.70,1509.79,1428.38,1559.48,1753.57,1755.10,1767.85,1714.87,
       1874.71,1597.40,1671.23,1387.22,1742.24,1684.07,1765.86,1661.58,1540.87,1557.44,1687.48,1598.52,
-      1828.02,1474.43,1877.27,1350.00,1579.34,1562.37,1650.06,1571.03,1767.85,1714.87];
+      1828.02,1474.43,1877.27,1350.00,1579.34,1562.37,1650.06,1571.03,1698.35,1380.00];
     // ---- Tor-Ticker (vom Simulator-iframe per postMessage gespeist) ----
     var gticker=document.getElementById('gticker'), gtHide=null, curTab='b';
     function hideGoal(){ if(gticker) gticker.classList.remove('show'); }
