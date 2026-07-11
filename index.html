@@ -73,7 +73,7 @@
     <button class="swtab active" data-v="b">🏆 K.o.-Runde</button>
     <button class="swtab" data-v="s">🎲 Simulation</button>
     <button class="bell" id="bellBtn" title="Tor-Benachrichtigungen">🔔</button>
-    <span id="vstamp">v4.32</span>
+    <span id="vstamp">v4.34</span>
   </div>
   <div class="frames">
     <iframe id="fb" class="frame" title="K.o.-Runde"></iframe>
@@ -535,7 +535,13 @@
     if(isOfficial) return 'done';
     te = String(te||"").toLowerCase();
     if(te==='finished') return 'done';
-    if(te && te!=='notstarted') return 'live';   // Quelle meldet laufendes Spiel (Minute/Status)
+    if(te && te!=='notstarted'){
+      // Quelle meldet "läuft" -> nur glauben, wenn der Anpfiff höchstens 15 Min entfernt ist.
+      // (worldcup26.ir setzt den Status teils STUNDEN zu früh auf live -> Datenpflege-Artefakt)
+      const kol=koTs(dd,tt);
+      if(kol===null || Date.now() >= kol - 15*60000) return 'live';
+      return (Date.now() >= kol - SOON_MS) ? 'soon' : 'upcoming';
+    }
     const ko=koTs(dd,tt); if(ko===null) return 'upcoming';
     const now=Date.now();
     if(te==='notstarted'){                        // Quelle: noch nicht angepfiffen -> nie "live"
@@ -544,6 +550,36 @@
     // keine Quelle-Info (Spiel (noch) nicht in den Daten) -> nie "live" ohne Bestätigung
     if(now>=ko-SOON_MS) return 'soon';
     return 'upcoming';
+  }
+
+  // ---- Beim Öffnen zur aktuellen Runde springen: live > nächster Anpfiff > sonst Finale ----
+  let autoJumped = false;
+  function jumpToCurrent(){
+    if(autoJumped) return; autoJumped = true;
+    let target=null, best=Infinity;
+    outer:
+    for(let r=0;r<COUNTS.length;r++){
+      for(let p=0;p<COUNTS[r];p++){
+        const st = matchStatus(official[r][p], dts[r][p][0], dts[r][p][1], telapsed[r][p]);
+        if(st==='done') continue;
+        if(st==='live'){ target={r,p}; break outer; }           // laufendes Spiel gewinnt immer
+        const ko = koTs(dts[r][p][0], dts[r][p][1]);
+        const t = (ko===null)?Infinity:ko;
+        if(t<best){ best=t; target={r,p}; }                      // sonst: nächster Anpfiff
+      }
+      if(target) break;                                          // nur die erste offene Runde betrachten
+    }
+    const el = target
+      ? document.querySelector(`.match[data-mr="${target.r}"][data-mp="${target.p}"]`)
+      : document.querySelector('.round.r4');                     // alles fertig -> Finale
+    if(el){
+      // Horizontal scrollt der .scroll-Container, vertikal das Fenster (transform-sicher via Rect-Delta)
+      const sc=document.querySelector('.scroll');
+      const r=el.getBoundingClientRect(), s=sc.getBoundingClientRect();
+      sc.scrollLeft += (r.left + r.width/2) - (s.left + s.width/2);
+      const r2=el.getBoundingClientRect();
+      window.scrollTo(0, Math.max(0, window.scrollY + r2.top + r2.height/2 - window.innerHeight/2));
+    }
   }
 
   // ---- Heute/Morgen-Markierung: welche Spiele sind heute/morgen, + Nummer des Tages ----
@@ -1048,7 +1084,8 @@
         if(!Array.isArray(games)) return;
         if(applyLiveGames(games)){ saveState(); render(); flashChanged(); }
       })
-      .catch(()=>{ /* Vorschau/offline/Quelle weg -> manueller Stand bleibt erhalten */ });
+      .catch(()=>{ /* Vorschau/offline/Quelle weg -> manueller Stand bleibt erhalten */ })
+      .then(()=>{ setTimeout(jumpToCurrent, 800); });   // einmalig zur aktuellen Runde springen (nach Einschwingen der Renders)
   }
 
   window.addEventListener("resize",()=>applyZoom());
